@@ -1,3 +1,6 @@
+## Aplicación base
+Repositorio base para realizar fork en nuevas aplicaciones.
+
 ## Instalación
 ### Instalación de paquetes
 ```bash
@@ -55,11 +58,11 @@ php artisan optimize
 ```
 
 ##### Links de utilidad
-[Documentación de laravel](https://laravel.com/docs/8.x)
-[Documentación de passport](https://laravel.com/docs/8.x/passport#introduction)
-[Documentación de spatie roles & permissions](https://spatie.be/docs/laravel-permission/v4/introduction)
-[Documentación de ArcaneDev/Log-viewer](https://github.com/ARCANEDEV/LogViewer)
-[Documentación de WildsideUK/Laravel-Userstamps](https://github.com/WildsideUK/Laravel-Userstamps)
+- [Documentación de laravel](https://laravel.com/docs/8.x)
+- [Documentación de passport](https://laravel.com/docs/8.x/passport#introduction)
+- [Documentación de spatie roles & permissions](https://spatie.be/docs/laravel-permission/v4/introduction)
+- [Documentación de ArcaneDev/Log-viewer](https://github.com/ARCANEDEV/LogViewer)
+- [Documentación de WildsideUK/Laravel-Userstamps](https://github.com/WildsideUK/Laravel-Userstamps)
 
 
 
