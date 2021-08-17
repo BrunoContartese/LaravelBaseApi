@@ -68,7 +68,8 @@ class User extends Authenticatable
         return 'api';
     }
 
-    public function findForPassport($username) {
+    public function findForPassport($username)
+    {
         return $this->where('email', $username)->first();
     }
 }

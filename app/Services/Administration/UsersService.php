@@ -13,6 +13,8 @@ class UsersService
 {
     private $relations = [
         'destroyer',
+        'roles',
+        'roles.permissions'
     ];
 
     public function index($request)

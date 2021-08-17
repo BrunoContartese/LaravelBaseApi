@@ -27,7 +27,7 @@ class PaginatorRequest extends FormRequest
             'page_size' => 'sometimes|required|integer',
             'orderBy' => 'sometimes',
             'orderType' => 'required_with:orderBy',
-            'searchQuery' => 'sometimes|required|string'
+            'query' => 'sometimes|string'
         ];
     }
 }

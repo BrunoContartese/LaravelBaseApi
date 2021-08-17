@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
+use App\Models\User;
 use Facades\App\Services\Administration\UsersService;
 use Facades\App\Services\Auth\AuthService;
 use GuzzleHttp\Client;
@@ -35,9 +36,8 @@ class AuthController extends Controller
             ]);
 
             return $response->getBody();
-
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            switch($e->getCode()) {
+            switch ($e->getCode()) {
                 case 401:
                     return response()->json([
                         'errors' => [
@@ -63,7 +63,7 @@ class AuthController extends Controller
 
     public function user()
     {
-        return auth()->user();
+        return User::with('roles', 'roles.permissions')->findOrFail(Auth::user()->id);
     }
 
     public function updatePassword(UpdatePasswordRequest $request)
@@ -84,8 +84,8 @@ class AuthController extends Controller
             $request->only('email')
         );
         return $status === Password::RESET_LINK_SENT
-         ? response()->json("Se ha envíado un email a {$request->email} con las instrucciones para restablecer la contraseña", Response::HTTP_OK)
-         : response()->json(['email' => __($status)], Response::HTTP_BAD_REQUEST);
+            ? response()->json("Se ha envíado un email a {$request->email} con las instrucciones para restablecer la contraseña", Response::HTTP_OK)
+            : response()->json(['email' => __($status)], Response::HTTP_BAD_REQUEST);
     }
 
     public function passwordResetView()
@@ -100,9 +100,9 @@ class AuthController extends Controller
             $user->save();
         });
 
-       if($reset_password_status == Password::INVALID_TOKEN) {
-           return response()->json('Token inválido.', Response::HTTP_UNPROCESSABLE_ENTITY);
-       }
+        if ($reset_password_status == Password::INVALID_TOKEN) {
+            return response()->json('Token inválido.', Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         return redirect(env('FRONT_END_URL', '/'));
     }
