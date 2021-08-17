@@ -1,0 +1,60 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use App\Http\Requests\Pagination\PaginatorRequest;
+
+class {{ class }} extends Controller
+{
+    private $service;
+
+    public function __construct(Service $service)
+    {
+        $this->service = $service;
+    }
+
+    public function index(Request $request)
+    {
+        $entities = $this->service->index($request);
+        return response()->json($entities, Response::HTTP_OK);
+    }
+
+    public function paginated(PaginatorRequest $request)
+    {
+        $entities = $this->service->paginated($request);
+        return response()->json($entities, Response::HTTP_OK);
+    }
+
+    public function store(Request $request)
+    {
+        $entity = $this->service->store($request);
+        return response()->json($entity, Response::HTTP_CREATED);
+    }
+
+    public function show($id)
+    {
+        $entity = $this->service->findById($id);
+        return response()->json($entity, Response::HTTP_OK);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $entity = $this->service->update($request, $id);
+        return response()->json($entity, Response::HTTP_OK);
+    }
+
+    public function destroy($id)
+    {
+        $this->service->destroy($id);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function restore($id)
+    {
+        $entity = $this->service->restore($id);
+        return response()->json($entity, Response::HTTP_OK);
+    }
+}

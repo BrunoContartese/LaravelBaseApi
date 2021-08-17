@@ -1,0 +1,84 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class {{ class }}
+{
+    private $relations = [];
+
+    public function index($request)
+    {
+        $entities = Model::withTrashed()
+            ->with($this->relations);
+
+        if( $request->has('query') ) {
+            //filter rules
+        }
+
+        if( $request->has('orderBy') ) {
+            $users->orderBy( $request->orderBy, $request->orderType );
+        }
+
+        return $entities->get();
+    }
+
+    public function paginated($request)
+    {
+        $entities = Model::withTrashed()
+            ->with($this->relations);
+
+        if( $request->has('query') ) {
+            //filter rules
+        }
+
+        return $entities->paginate($request->page_size ?? 15);
+    }
+
+    public function store($request)
+    {
+        try {
+            DB::beginTransaction();
+            $entity = Model::create($request->all());
+            DB::commit();
+            return $entity;
+        } catch (\Error $e) {
+            DB::rollBack();
+            Log::warning("Ha ocurrido una excepción ({{ class }}.store): {$e->getMessage()}");
+        }
+    }
+
+    public function findById($id)
+    {
+        return Model::withTrashed()->with($this->relations)->findOrFail($id);
+    }
+
+    public function update($request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            $entity = Model::with($this->relations)->findOrFail($id);
+            $entity->update($request->all());
+            DB::commit();
+            return $entity;
+        } catch (\Error $e) {
+            DB::rollBack();
+            Log::warning("Ha ocurrido una excepción ({{ class }}.update): {$e->getMessage()}");
+        }
+    }
+
+    public function destroy($id)
+    {
+        $entity = Model::findOrFail($id);
+        $entity->delete();
+    }
+
+    public function restore($id)
+    {
+        $entity = Model::withTrashed()->with($this->relations)->findOrFail($id);
+        $entity->restore();
+        return $entity;
+    }
+}
