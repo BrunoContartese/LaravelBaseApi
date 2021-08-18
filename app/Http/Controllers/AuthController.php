@@ -8,9 +8,7 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Models\User;
-use Facades\App\Services\Administration\UsersService;
-use Facades\App\Services\Auth\AuthService;
-use GuzzleHttp\Client;
+use App\Services\Auth\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,69 +18,48 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+    private $service;
+
+    public function __construct(AuthService $service)
+    {
+        $this->service = $service;
+    }
+
     public function login(LoginRequest $request)
     {
-        $http = new Client;
+        $response = $this->service->login($request);
 
-        try {
-            $response = $http->post(config('services.passport.login_endpoint'), [
-                'form_params' => [
-                    'grant_type' => 'password',
-                    'client_id' => config('services.passport.client_id'),
-                    'client_secret' => config('services.passport.client_secret'),
-                    'username' => $request->email,
-                    'password' => $request->password,
-                ]
-            ]);
-
-            return $response->getBody();
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            switch ($e->getCode()) {
-                case 401:
-                    return response()->json([
-                        'errors' => [
-                            'password' => 'Las credenciales ingresadas son incorrectas.',
-                        ],
-                    ], $e->getCode());
-                    break;
-                default:
-                    return response()->json('Ha ocurrido un error en el servidor.', $e->getCode());
-                    break;
-            }
-        }
+        return $response->getBody();
     }
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens->each(function ($token, $key) {
-            $token->delete();
-        });
-
+        $this->service->deleteTokens();
         return response()->json('Sesion cerrada correctamente.', 200);
     }
 
     public function user()
     {
-        return User::with('roles', 'roles.permissions')->findOrFail(Auth::user()->id);
+        $user = $this->service->user();
+        return response()->json($user, Response::HTTP_OK);
     }
 
     public function updatePassword(UpdatePasswordRequest $request)
     {
-        $user = AuthService::updatePassword($request);
+        $user = $this->service->updatePassword($request);
         return response()->json(Auth::user(), Response::HTTP_OK);
     }
 
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = AuthService::updateProfile($request);
+        $user = $this->service->updateProfile($request);
         return response()->json(Auth::user(), Response::HTTP_OK);
     }
 
     public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+
+        $status = $this->service->sendResetLinkEmail($request);
         return $status === Password::RESET_LINK_SENT
             ? response()->json("Se ha envíado un email a {$request->email} con las instrucciones para restablecer la contraseña", Response::HTTP_OK)
             : response()->json(['email' => __($status)], Response::HTTP_BAD_REQUEST);
@@ -105,5 +82,11 @@ class AuthController extends Controller
         }
 
         return redirect(env('FRONT_END_URL', '/'));
+    }
+
+    public function updatePicture(UpdateProfileRequest $request)
+    {
+        $user = $this->service->updateProfilePicture($request);
+        return response()->json(Auth::user(), Response::HTTP_OK);
     }
 }
