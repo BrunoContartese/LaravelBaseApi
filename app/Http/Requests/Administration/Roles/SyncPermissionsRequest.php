@@ -16,7 +16,8 @@ class SyncPermissionsRequest extends FormRequest
     public function rules()
     {
         return [
-            'permissions' => 'required|array'
+            'permissions' => 'required|array',
+            'permissions.*.id' => 'exists:permissions,id'
         ];
     }
 
@@ -24,7 +25,8 @@ class SyncPermissionsRequest extends FormRequest
     {
         return [
             'permissions.required' => 'Debe seleccionar al menos 1 permiso.',
-            'permissions.array' => 'Debe seleccionar al menos 1 permiso.'
+            'permissions.array' => 'Debe seleccionar al menos 1 permiso.',
+            'permissions.*.id.exists' => 'Los permisos seleccionados no son válidos'
         ];
     }
 }

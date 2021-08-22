@@ -28,11 +28,11 @@ class UsersService
             });
         }
 
-        if ($request->has('query')) {
+        if ($request->has('q')) {
             $users->where(function ($q) use ($request) {
-                $q->where('family_name', 'LIKE', "%{$request->query}%")
-                    ->orWhere('email', 'LIKE', "%{$request->query}%")
-                    ->orWhere('given_name', 'LIKE', "%{$request->query}%");
+                $q->where('family_name', 'LIKE', "%{$request->q}%")
+                    ->orWhere('email', 'LIKE', "%{$request->q}%")
+                    ->orWhere('given_name', 'LIKE', "%{$request->q}%");
             });
         }
 
@@ -47,11 +47,11 @@ class UsersService
     {
         $users = User::with($this->relations)->withTrashed();
 
-        if ($request->has('query')) {
+        if ($request->has('q')) {
             $users->where(function ($q) use ($request) {
-                $q->where('family_name', 'LIKE', "%{$request->query}%")
-                    ->orWhere('email', 'LIKE', "%{$request->query}%")
-                    ->orWhere('given_name', 'LIKE', "%{$request->query}%");
+                $q->where('family_name', 'LIKE', "%{$request->q}%")
+                    ->orWhere('email', 'LIKE', "%{$request->q}%")
+                    ->orWhere('given_name', 'LIKE', "%{$request->q}%");
             });
         }
 
@@ -82,14 +82,12 @@ class UsersService
             $data = [
                 'given_name' => $request->given_name,
                 'family_name' => $request->family_name,
-                'phone_number' => $request->phone_number,
-                'birthdate' => Carbon::parse($request->birthdate)->format('Ymd'),
                 'picture' => $request->picture,
                 'email' => $request->email,
                 'password' => Hash::make($request->password)
             ];
             $user = User::create($data);
-            $user->syncRoles($request->role);
+            $user->syncRoles($request->roles);
             DB::commit();
             return $user;
         } catch (\Error $e) {
@@ -103,15 +101,27 @@ class UsersService
     {
         try {
             DB::beginTransaction();
-            $data = $request->all();
+
+            $data = [
+                'given_name' => $request->given_name,
+                'family_name' => $request->family_name,
+                'picture' => $request->picture,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ];
+
             if ($request->has('password')) {
                 $data['password'] = Hash::make($request->password);
             }
+
             $user = User::with($this->relations)->withTrashed()->findOrFail($id);
+
             $user->update($data);
-            if ($request->has('role')) {
-                $user->syncRoles($request->role);
+
+            if ($request->has('roles')) {
+                $user->syncRoles($request->roles);
             }
+            
             DB::commit();
             return $user;
         } catch (\Error $e) {

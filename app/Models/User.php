@@ -48,18 +48,20 @@ class User extends Authenticatable
         'password' => 'required|min:8',
         'given_name' => 'required',
         'family_name' => 'required',
-        'role' => 'required|exists:roles,name'
+        'roles' => 'required|array',
+        'roles.*' => 'exists:roles,name'
     ];
 
     public static $messages = [
+        'email.email' => 'Debe ingresar un email válido.',
         'email.required' => 'El campo email no puede estar vacío.',
         'email.unique' => 'El email ingresado ya se encuentra registrado en el sistema.',
         'password.required' => 'Debe ingresar una contraseña.',
         'password.min' => 'La contraseña debe contener como mínimo 8 caracteres.',
         'given_name.required' => 'Debe ingresar el nombre del usuario.',
         'family_name.required' => 'Debe ingresar el apellido del usuario.',
-        'role.required' => 'Debe indicar el rol del usuario.',
-        'role.exists' => 'El rol seleccionado no es válido.'
+        'roles.required' => 'Debe indicar los roles del usuario.',
+        'roles.*.exists' => 'El rol seleccionado no es válido.'
     ];
 
     protected function getDefaultGuardName(): string

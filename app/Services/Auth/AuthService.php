@@ -58,7 +58,7 @@ class AuthService
 
     public function user()
     {
-        return User::with('roles', 'roles.permissions')->findOrFail(Auth::user()->id)
+        return User::with('roles', 'roles.permissions')->findOrFail(Auth::user()->id);
     }
 
     public function updatePassword($request)

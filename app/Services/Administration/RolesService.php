@@ -8,14 +8,14 @@ use Illuminate\Validation\ValidationException;
 
 class RolesService
 {
-    private $relations = [];
+    private $relations = ['permissions'];
 
     public function index($request)
     {
-        $roles = Role::query();
+        $roles = Role::with($this->relations);
 
-        if ($request->has('query')) {
-            $roles->where('name', 'like', "%{$request->query}%");
+        if ($request->has('q')) {
+            $roles->where('name', 'like', "%{$request->q}%");
         }
 
         if ($request->has('orderBy')) {
@@ -27,10 +27,10 @@ class RolesService
 
     public function paginated($request)
     {
-        $roles = Role::query();
+        $roles = Role::with($this->relations);
 
-        if ($request->has('query')) {
-            $roles->where('name', 'like', "%{$request->query}%");
+        if ($request->has('q')) {
+            $roles->where('name', 'like', "%{$request->q}%");
         }
 
         if ($request->has('orderBy')) {
@@ -50,7 +50,6 @@ class RolesService
         try {
             return Role::create([
                 'name' => $data->name,
-                'is_editable' => $data->is_editable,
                 'guard_name' => 'api'
             ]);
         } catch (\Exception $e) {
