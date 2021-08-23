@@ -33,24 +33,6 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 
-### Instalar passport
-```bash
-php artisan passport:install
-```
-##### Esto nos devolverá en pantalla un resultado como el siguiente:
-```bash
-Personal access client created successfully.
-Client ID: 1
-Client secret: KnnAFGz8EL7gUEDheDylkphebnCWZdZxlfDziUMW
-Password grant client created successfully.
-Client ID: 2
-Client secret: IxDJuwoUMpNhJrI5GMgURRkaE4Mbo8VFkJfkrSGz
-```
-##### Por último, se debe asignar el valor del "Client secret" con ''Client ID" = 2 a la variable del archivo .env llamada PASSPORT_CLIENT_SECRET.
-##### Entonces en el archivo .env modificamos la variable PASSPORT_CLIENT_SECRET
-```bash
-PASSPORT_CLIENT_SECRET=IxDJuwoUMpNhJrI5GMgURRkaE4Mbo8VFkJfkrSGz
-```
 ##### Nota: Cada vez que se actualice el archivo routes/api.php, o el archivo .env recordar correr el siguiente comando:
 
 ```bash
